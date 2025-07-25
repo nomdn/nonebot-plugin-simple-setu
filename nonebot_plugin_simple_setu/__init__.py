@@ -15,6 +15,8 @@ __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-simple-setu",
     description="一个简单到不能再简单的色图插件",
     usage="通过指令获取setu",
+    type="application",
+    homepage="https://github.com/nomdn/nonebot-plugin-simple-setu",
     config=Config,
     supported_adapters={"~onebot.v11"},
 )

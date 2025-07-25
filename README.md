@@ -10,6 +10,16 @@
 
 _✨ NoneBot 简单色图插件 ✨_
 
+<a href="./LICENSE">
+    <img src="https://img.shields.io/github/license/owner/nonebot-plugin-template.svg" alt="license">
+</a>
+<a href="https://pypi.org/project/nonebot-plugin-simple-setu/">
+    <img src="https://img.shields.io/pypi/v/nonebot-plugin-template.svg" alt="pypi">
+</a>
+<img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
+
+</div>
+
 ## 📖 介绍
 一个简单到不能再简单的色图插件
 
