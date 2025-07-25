@@ -28,7 +28,7 @@ _✨ NoneBot 简单色图插件 ✨_
 
 <details open>
 <summary>使用 nb-cli 安装</summary>
-在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装
+在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装（别用！我的插件还没进商店）
 
     nb plugin install nonebot-plugin-simple-setu
 
@@ -61,7 +61,7 @@ _✨ NoneBot 简单色图插件 ✨_
 
 打开 nonebot2 项目根目录下的 `pyproject.toml` 文件, 在 `[tool.nonebot]` 部分追加写入
 
-    plugins = ["nonebot_plugin_simple-setu"]
+    plugins = ["nonebot_plugin_simple_setu"]
 
 </details>
 
