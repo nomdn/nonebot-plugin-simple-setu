@@ -12,7 +12,7 @@ from .config import Config
 from nonebot import on_command
 
 __plugin_meta__ = PluginMetadata(
-    name="nonebot_plugin_simple_setu",
+    name="nonebot-plugin-simple-setu",
     description="一个简单到不能再简单的色图插件",
     usage="通过指令获取setu",
     config=Config,
