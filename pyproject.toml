@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nonebot-plugin-simple-setu"
-version = "0.1.15"
+version = "0.1.16"
 description = "一个简单到不能再简单的色图插件"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -18,7 +18,7 @@ keywords = ["nonebot2", "plugin", "setu", "image", "pixiv"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: LGPL License",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
