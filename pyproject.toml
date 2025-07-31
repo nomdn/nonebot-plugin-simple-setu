@@ -30,13 +30,13 @@ classifiers = [
 dependencies = [
     "nonebot2 >= 2.0.0",
     "nonebot-adapter-onebot >= 2.0.0",
-    "httpx",
+    "httpx >= 0.28.1",
 ]
 
 [project.urls]
 homepage = "https://github.com/nomdn/nonebot-plugin-simple-setu"
 repository = "https://github.com/nomdn/nonebot-plugin-simple-setu"
-documentation = "https://nonebot.dev/docs"
+documentation = "https://github.com/nomdn/nonebot-plugin-simple-setu"
 
 [project.optional-dependencies]
 dev = [
