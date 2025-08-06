@@ -7,4 +7,4 @@ class Config(BaseModel):
     #0为lolicon
     #1为jitsu
     #在某些情况下jitsu比lolicon快
-    api_url :int= 0
+    simple_setu_api_url :int= 0

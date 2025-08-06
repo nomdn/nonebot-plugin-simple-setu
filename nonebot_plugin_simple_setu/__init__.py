@@ -25,10 +25,6 @@ __plugin_meta__ = PluginMetadata(
 
 config = get_plugin_config(Config)
 
-sub_plugins = nonebot.load_plugins(
-    str(Path(__file__).parent.joinpath("plugins").resolve())
-)
-
 # 创建一个异步客户端
 http_client = httpx.AsyncClient()
 
@@ -36,7 +32,7 @@ setu = on_command("setu", aliases={"色图", "来份色图"})
 
 @setu.handle()
 async def handle_function(event: MessageEvent, args: Message = CommandArg()):
-    if config.api_url == 0:
+    if config.simple_setu_api_url == 0:
         # 提取参数纯文本作为地名，并判断是否有效
         if tag := args.extract_plain_text():
             sender_qq = event.get_user_id()
@@ -69,7 +65,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
                 raise
             except Exception as e:
                 await setu.finish(f"发生错误：{e}")
-    elif config.api_url == 1:
+    elif config.simple_setu_api_url == 1:
         if tag := args.extract_plain_text():
             try:
                 sender_qq = event.get_user_id()
