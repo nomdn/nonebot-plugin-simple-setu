@@ -9,6 +9,10 @@ from nonebot.exception import MatcherException
 from nonebot.plugin import PluginMetadata
 from nonebot.adapters import Message
 from nonebot.params import CommandArg
+from nonebot.plugin.on import on_message, on_keyword
+from nonebot.rule import to_me
+from typing_inspection.typing_objects import alias
+
 from .config import Config
 from nonebot import on_command
 import httpx  # 替换 requests 用的 httpx
@@ -44,8 +48,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
                 pid = json_dict["data"][0]["pid"]
                 author = json_dict["data"][0]["author"]
                 url = json_dict["data"][0]["urls"]["original"]
-                await setu.send(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}")
-                await setu.finish(MessageSegment.image(f"{url}"))
+                await setu.send(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
             except MatcherException:
                 raise
             except Exception as e:
@@ -59,8 +62,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
                 pid = json_dict["data"][0]["pid"]
                 author = json_dict["data"][0]["author"]
                 url = json_dict["data"][0]["urls"]["original"]
-                await setu.send(MessageSegment.at(sender_qq) + f"\n标题:{title}\nPID:{pid}\n作者:{author}")
-                await setu.finish(MessageSegment.image(f"{url}"))
+                await setu.send(MessageSegment.at(sender_qq) + f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
             except MatcherException:
                 raise
             except Exception as e:
@@ -75,8 +77,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
                 pid = json_dict[0]["pid"]
                 author = json_dict[0]["user"]
                 url = json_dict[0]["url"]
-                await setu.send(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}")
-                await setu.finish(MessageSegment.image(f"{url}"))
+                await setu.finish(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
             except MatcherException:
                 raise
             except Exception as e:
@@ -90,8 +91,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
                 pid = json_dict[0]["pid"]
                 author = json_dict[0]["user"]
                 url = json_dict[0]["url"]
-                await setu.send(MessageSegment.at(sender_qq) + f"\n标题:{title}\nPID:{pid}\n作者:{author}")
-                await setu.finish(MessageSegment.image(f"{url}"))
+                await setu.finish(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
             except MatcherException:
                 raise
             except Exception as e:
@@ -108,8 +108,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
         json_dict_leg = response_leg.json()
         image_leg = json_dict_leg["text"]
         at_segment_leg = MessageSegment.at(user_id=sender_qq_leg)
-        await setu.send(at_segment_leg)
-        await setu.finish(MessageSegment.image(image_leg))
+        await leg.finish(at_segment_leg+MessageSegment.image(image_leg))
     except MatcherException:
         raise
     except Exception as e:
@@ -126,9 +125,22 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
         json_dict_girl = response_girl.json()
         image_girl = json_dict_girl["data"]["image"]
         at_segment_girl = MessageSegment.at(user_id=sender_qq_girl)
-        await girl.send(at_segment_girl)
-        await girl.finish(MessageSegment.image(image_girl))
+        await girl.finish(at_segment_girl+MessageSegment.image(image_girl))
     except MatcherException:
         raise
     except Exception as e:
         await girl.finish(f"发生错误：{e}")
+fake_cross_dresser = on_keyword({"看看腿"},rule=to_me())
+@fake_cross_dresser.handle()
+async def handle_function(event: MessageEvent):
+    try:
+        sender_qq_fake = event.get_user_id()
+        response_fake = await http_client.get("https://api.lolimi.cn/API/meizi/api.php?type=json")
+        json_dict_fake = response_fake.json()
+        image_fake = json_dict_fake["text"]
+        at_segment_fake = MessageSegment.at(user_id=sender_qq_fake)
+        await fake_cross_dresser.finish(at_segment_fake+"\n"+MessageSegment.image(image_fake))
+    except MatcherException:
+        raise
+    except Exception as e:
+        await fake_cross_dresser.finish(f"发生错误：{e}")
