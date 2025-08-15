@@ -68,7 +68,6 @@ _✨ NoneBot 简单色图插件 ✨_
 ## ⚙️ 配置
 
 在 nonebot2 的.venv/lib/pytho版本/site-packages/nonebot_plugin_simple_setu/config.py中
-setu_url
 
 
 ## 🎉 使用
