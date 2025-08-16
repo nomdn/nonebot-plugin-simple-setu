@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nonebot-plugin-simple-setu"
-version = "0.1.26"
+version = "0.1.27"
 description = "一个简单到不能再简单的色图插件"
 readme = "README.md"
 requires-python = ">=3.8"

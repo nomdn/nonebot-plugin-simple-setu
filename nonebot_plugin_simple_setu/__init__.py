@@ -150,7 +150,7 @@ async def handle_function(event: MessageEvent, args: Message = CommandArg()):
 fake_cross_dresser = on_keyword({"看看腿"},rule=to_me())
 @fake_cross_dresser.handle()
 async def handle_function(event: MessageEvent):
-    if config.simple_setu_on_keyword_enable == 1:
+    if config.simple_setu_on_keyword_leg_enable == 1:
 
         try:
             sender_qq_fake = event.get_user_id()
@@ -163,7 +163,7 @@ async def handle_function(event: MessageEvent):
             raise
         except Exception as e:
             await fake_cross_dresser.finish(f"发生错误：{e}")
-    elif config.simple_setu_on_keyword_enable == 0:
+    elif config.simple_setu_on_keyword_leg_enable == 0:
         fake_cross_dresser.finish("at获取腿子图已关闭")
     else:
         fake_cross_dresser.finish("你的配置有误")
