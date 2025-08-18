@@ -79,6 +79,8 @@ _✨ NoneBot 简单色图插件 ✨_
 | /girl |  群员  |  否  | 群聊 |随机获得一张少女写真亦可以用/少女写真,/来份写真|
 |  看看腿  | 群员 |  是  | 群聊 | 随机获得一张腿子图|
 ### 效果图
-<img width="451" height="515" alt="QQ20250725-124800" src="https://github.com/user-attachments/assets/000279f6-7139-47e5-b491-7f9225256c2a" />
-<img width="656" height="554" alt="QQ20250725-124921" src="https://github.com/user-attachments/assets/08f5d851-1cda-4c14-b41b-948111df3f3e" />
-<img width="510" height="589" alt="QQ20250725-124856" src="https://github.com/user-attachments/assets/1111a7bc-97e2-44ca-aa72-2f44b72fe335" />
+
+<img width="705" height="429" alt="QQ20250818-110055" src="https://github.com/user-attachments/assets/a24e0db2-0429-40c5-8f1d-0dd962917989" />
+<img width="705" height="495" alt="QQ20250818-105958" src="https://github.com/user-attachments/assets/ffe76de5-fbbc-44ba-9e83-a8b1793b8fa2" />
+<img width="687" height="444" alt="QQ20250818-110018" src="https://github.com/user-attachments/assets/76dc922c-4be5-4d82-a182-0358d535803b" />
+<img width="690" height="482" alt="QQ20250818-110030" src="https://github.com/user-attachments/assets/edea2645-42bf-463d-9b80-243eadd85288" />
