@@ -1,7 +1,7 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/nomdn/nonebot-plugin-simple-setu/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+  <a href="https://v2.nonebot.dev/store"><img src="https://cdn.jsdelivr.net/gh/nomdn/nonebot-plugin-simple-setu@resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
   <br>
-  <p><img src="https://github.com/nomdn/nonebot-plugin-simple-setu/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
+  <p><img src="https://cdn.jsdelivr.net/gh/nomdn/nonebot-plugin-simple-setu@resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
 </div>
 
 <div align="center">
@@ -22,7 +22,7 @@ _✨ NoneBot 简单色图插件 ✨_
 
 ## 📖 介绍
 一个简单到不能再简单的色图插件
-
+正在进行大重构
 
 ## 💿 安装
 
@@ -67,20 +67,30 @@ _✨ NoneBot 简单色图插件 ✨_
 
 ## ⚙️ 配置
 
-在 nonebot2 的.venv/lib/pytho版本/site-packages/nonebot_plugin_simple_setu/config.py中
+在 系统配置目录 nonebot2/nonebot_plugin_simple_setu/config.toml 中修改以下内容
+```` toml
+[simple_setu]
+# pixiv 图片proxy（可选）
+pixiv_proxy = ""
+# 功能开关
+enable_setu = true
+enable_dress_api_keyword = true
+# dress-api url配置（可选）
+dress_api_url = ""
+# 冷却时间
+cooldown_time = 10
+# 速率限制
+limit= 2
 
+````
 
 ## 🎉 使用
 ### 指令表
 |  指令   |  权限  | 需要@ | 范围 | 说明 |
 |:-----:|:----:|:---:|:--:|:----:|
 | /setu |  群员  |  否  | 群聊 | 随机获得一张色图,后面可以加tag，如/setu tag |
-| /leg  |  群员  |  否  | 群聊 | 随机获得一张腿子图,亦可以用/腿子 ,/来份腿子 |
-| /girl |  群员  |  否  | 群聊 |随机获得一张少女写真亦可以用/少女写真,/来份写真|
-|  看看腿  | 群员 |  是  | 群聊 | 随机获得一张腿子图|
+| /dress-api  |  群员  |  否  | 群聊 | 获取一张男娘图片 |
 ### 效果图
 
-<img width="705" height="429" alt="QQ20250818-110055" src="https://github.com/user-attachments/assets/a24e0db2-0429-40c5-8f1d-0dd962917989" />
-<img width="705" height="495" alt="QQ20250818-105958" src="https://github.com/user-attachments/assets/ffe76de5-fbbc-44ba-9e83-a8b1793b8fa2" />
-<img width="687" height="444" alt="QQ20250818-110018" src="https://github.com/user-attachments/assets/76dc922c-4be5-4d82-a182-0358d535803b" />
-<img width="690" height="482" alt="QQ20250818-110030" src="https://github.com/user-attachments/assets/edea2645-42bf-463d-9b80-243eadd85288" />
+
+

@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nonebot-plugin-simple-setu"
-version = "0.1.31"
+version = "0.2.0"
 description = "一个简单到不能再简单的色图插件"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10,<4.0"
 license = { file = "LICENSE" }
 
 authors = [
@@ -31,6 +31,9 @@ dependencies = [
     "nonebot2 >= 2.3.0,<3.0.0",
     "nonebot-adapter-onebot >= 2.0.0",
     "httpx >= 0.28.1",
+    "nonebot-plugin-send-anything-anywhere>=0.7.1",
+    "nonebot-plugin-limiter>=0.4.3",
+    "tomli-w>=1.2.0",
 ]
 
 [project.urls]
@@ -45,3 +48,6 @@ dev = [
     "flake8",
     "isort",
 ]
+[[tool.uv.index]]
+name = "tencent"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"

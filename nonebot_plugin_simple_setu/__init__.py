@@ -1,18 +1,25 @@
+import os
 from pathlib import Path
 import json
-from nonebot import get_plugin_config
-from nonebot.adapters.onebot.v11 import MessageSegment, MessageEvent, ActionFailed
-from nonebot.exception import MatcherException
+from nonebot.permission import SUPERUSER
+from nonebot import require
 from nonebot.plugin import PluginMetadata
 from nonebot.adapters import Message
 from nonebot.params import CommandArg
 from nonebot.plugin.on import on_message, on_keyword
 from nonebot.rule import to_me
-import asyncio
 from .config import Config
 from nonebot import on_command
 import httpx  # 替换 requests 用的 httpx
-from nonebot import get_driver
+import tomllib
+import tomli_w
+require("nonebot_plugin_limiter")
+require("nonebot_plugin_saa")
+require("nonebot_plugin_localstore")
+
+from nonebot_plugin_saa import Image, MessageFactory,Text
+from nonebot_plugin_limiter import UserScope, Cooldown
+import nonebot_plugin_localstore as store
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-simple-setu",
@@ -24,211 +31,168 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={"~onebot.v11"},
 )
 
-config = get_plugin_config(Config)
+config_file = store.get_plugin_config_file("config.toml")
+if not config_file.exists():
+    config = {
+        "simple_setu": {
+            "pixiv_proxy": "",
+            "enable_setu": True,
+            "enable_dress_api_keyword": True,
+            "dress_api_url": "",
+            "cooldown_time": 0,
+            "limit": 10
+        }
+    }
+    with open(config_file, "wb") as f:
+        tomli_w.dump(config, f)
+with open(config_file, "rb") as f:
+    config = tomllib.load(f)
+proxy = config["simple_setu"]["pixiv_proxy"]
+enable_setu = config["simple_setu"]["enable_setu"]
+enable_leg_keyword = config["simple_setu"]["enable_dress_api_keyword"]
+dress_api_url = config["simple_setu"]["dress_api_url"]
+cooldown_time = config["simple_setu"]["cooldown_time"]
+limit = config["simple_setu"]["limit"]
 
 # 创建一个异步客户端
-http_client = httpx.AsyncClient()
 
+
+async def get_setu_json(tag: list = None):
+
+    url = f"https://api.lolicon.app/setu/v2"
+    if tag:
+        if len(tag) > 3:
+            raise RuntimeError("标签数量不能超过3个")
+    use_proxy = proxy or "pixiv-proxy.wsmdn.dpdns.org"
+
+
+    async with httpx.AsyncClient() as http_client:
+        response = await http_client.post(url,json={
+        "r18": 0,
+        "tag": tag,
+        "proxy": use_proxy})
+
+    return response.json()
+async def get_dress_api_data(url: str):
+    urls = ["https://api.wsmdn.top/v2/dress","https://dress.wsmdn.top/v1/dress"]
+
+    if not url:
+        for url in urls:
+            async with httpx.AsyncClient() as http_client:
+                try:
+                    response = await http_client.get(url)
+                    if response.status_code == 200:
+                        response = response.json()
+                except httpx.RequestError:
+                    continue
+        else:
+            raise RuntimeError("所有API请求失败")
+    else:
+        async with httpx.AsyncClient() as http_client:
+            response = await http_client.get(url)
+            if response.status_code == 200:
+                response = response.json()
+            raise RuntimeError("API请求失败")
+    finally_result = {
+        "author": "",
+        "hash": "",
+        "time": "",
+        "path": "",
+        
+    }
+    try:
+    
+        url = response["img_url"]
+        update_time = response["upload_time"]
+        author = response["img_author"]
+    except:
+        url = response["path"]
+        update_time = response["time"]
+        author = response["author"]
+    finally_result["author"] = author
+    finally_result["hash"] = response["hash"]
+    finally_result["time"] = update_time
+    finally_result["path"] = url
+    return finally_result
 setu = on_command("setu", aliases={"色图", "来份色图"})
-
-@setu.handle()
-async def handle_function(event: MessageEvent, args: Message = CommandArg()):
-    if config.simple_setu_enable == 1:
-        # 判断功能是否开启
-        if config.simple_setu_api_url == 0:
-            # 判断api的类型
-            if tag := args.extract_plain_text():
-                # 检测是否传入tag
-                sender_qq = event.get_user_id()
-                # 使用 httpx 替换 requests
-                for i in range(5):
-                    try:
-                        response = await http_client.get(f"https://api.lolicon.app/setu/v2?tag={tag}&proxy=pixiv-proxy.wsmdn.dpdns.org")
-                       # 获取色图api的json文件
-                        json_dict = response.json()
-                        # 解析文件 格式参考example.json
-                        title = json_dict["data"][0]["title"]
-                        pid = json_dict["data"][0]["pid"]
-                        author = json_dict["data"][0]["author"]
-                        url = json_dict["data"][0]["urls"]["original"]
-                        # 发送消息 格式： @qq + 标题 + pid + 作者 + 图片
-                        await setu.finish(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
-                        return
-                    except MatcherException:
-                        raise
-                    except Exception as e:
-                        if i == 4:
-                            await setu.finish(f"发生错误{e}")
-                        else:
-                            await asyncio.sleep(2)
-                            continue
-            else:
-                # 无tag传入则不加入tag参数获取json文件
-
-                for i in range(5):
-                    try:
-                        sender_qq = event.get_user_id()
-                        response = await http_client.get(f"https://api.lolicon.app/setu/v2?proxy=pixiv-proxy.wsmdn.dpdns.org")
-                        json_dict = response.json()
-                        #同上
-                        title = json_dict["data"][0]["title"]
-                        pid = json_dict["data"][0]["pid"]
-                        author = json_dict["data"][0]["author"]
-                        url = json_dict["data"][0]["urls"]["original"]
-                        await setu.finish(MessageSegment.at(sender_qq) + f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
-                        return
-                    except MatcherException:
-                        raise
-                    except Exception as e:
-                        if i == 4:
-                            await setu.finish(f"发生错误{e}")
-                        else:
-                            await asyncio.sleep(2)
-                            continue
-        elif config.simple_setu_api_url == 1:
-            #jitsu api
-            if tag := args.extract_plain_text():
-
-                for i in range(5):
-
-                    try:
-                        sender_qq = event.get_user_id()
-                        response = await http_client.get(f"https://image.anosu.top/pixiv/json?keyword={tag}&proxy=pixiv-proxy.wsmdn.dpdns.org")
-                        json_dict = response.json()
-                        title = json_dict[0]["title"]
-                        pid = json_dict[0]["pid"]
-                        author = json_dict[0]["user"]
-                        url = json_dict[0]["url"]
-                        await setu.finish(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
-                        return
-                    except MatcherException:
-                        raise
-                    except Exception as e:
-                        if i == 4:
-                            await setu.finish(f"发生错误{e}")
-                        else:
-                            await asyncio.sleep(2)
-                            continue
-            else:
-                for i in range(5):
-                    try:
-                        sender_qq = event.get_user_id()
-                        response = await http_client.get("https://image.anosu.top/pixiv/json?proxy=pixiv-proxy.wsmdn.dpdns.org")
-                        json_dict = response.json()  # 注意：这里可能需要异常处理
-                        title = json_dict[0]["title"]
-                        pid = json_dict[0]["pid"]
-                        author = json_dict[0]["user"]
-                        url = json_dict[0]["url"]
-                        await setu.finish(MessageSegment.at(sender_qq)+f"\n标题:{title}\nPID:{pid}\n作者:{author}\n"+MessageSegment.image(f"{url}"))
-                        return
-                    except MatcherException:
-                        raise
-                    except Exception as e:
-                        if i == 4:
-                            await setu.finish(f"发生错误{e}")
-
-                        else:
-                            await asyncio.sleep(2)
-                            continue
+@setu.handle(parameterless=[
+    Cooldown(
+        UserScope(  # entity, `UserScope` 统计范围为所有用户在任意场景的使用量
+        permission=SUPERUSER
+        ),    # 两种白名单方式
+        int(cooldown_time),    # period, 冷却时长，单位为秒
+        limit = limit,  # 最大触发次数
+        reject = "要被玩爆了喵", # 可选，超额使用时的提示词
+        name = "simple-setu" # 可选，使用统计集合名称，填写名称将开启该集合的持久化
+    )])
+async def handle_function(
+    args: Message = CommandArg(),
+):
+    if enable_setu:
+        if tags := args.extract_plain_text():
+            tags = tags.split(" ")[:3]
+        for i in range(5):
+            try:  
+                data = await get_setu_json(tag=tags)
+                if data["data"]:
+                    break
+                else:
+                    await setu.finish("没有找到结果喵~")
+            except Exception as e:
+                error =e
+                continue
 
         else:
-            await setu.finish("你的配置有误！")
-    elif config.simple_girl_enable == 0:
-        await setu.finish("setu功能已关闭！")
+            await setu.finish(f"请求色图API失败了喵~,{error}")
+        data = data["data"][0]
+        pid = data["pid"]
+        title = data["title"]
+        author = data["author"]
+        image_url = data["urls"]["original"]
+        MessageText = Text(f"\n作品PID:{pid}\n标题:{title}\n作者:{author}\n")
+        MessageImage = Image(image_url)
+        await MessageFactory([MessageText,MessageImage]).send(at_sender=True,
+                                                            reply=True)
     else:
-        await setu.finish("你的配置有误")
-
-leg = on_command("leg", aliases={"腿子", "来份腿子"})
-
-@leg.handle()
-async def handle_function(event: MessageEvent, args: Message = CommandArg()):
-    # 提取参数纯文本作为地名，并判断是否有效
-    if config.simple_setu_on_command_leg_enable == 1:
-        sender_qq_leg = event.get_user_id()
+        await setu.finish("主人想让你戒色喵~")
+femboy = on_command("dress-api", aliases={"小南梁", "小男娘"})
+@femboy.handle(parameterless=[
+    Cooldown(
+        UserScope(  # entity, `UserScope` 统计范围为所有用户在任意场景的使用量
+        permission=SUPERUSER
+        ),    # 两种白名单方式
+        int(cooldown_time),    # period, 冷却时长，单位为秒
+        limit = limit,  # 最大触发次数
+        reject = "要被玩爆了喵", # 可选，超额使用时的提示词
+        name = "simple-dress-api" # 可选，使用统计集合名称，填写名称将开启该集合的持久化
+    )])
+async def handle_femboy(
+):
+    if enable_leg_keyword:
         for i in range(5):
             try:
-                # 获取腿子图api json 文件
-                response_leg = await http_client.get("https://api.lolimi.cn/API/meizi/api.php?type=json")
-                json_dict_leg = response_leg.json()
-                # 该api只返回url和code
-                image_leg = json_dict_leg["text"]
-                at_segment_leg = MessageSegment.at(user_id=sender_qq_leg)
-                # 发送消息 格式： @qq+图片
-                await leg.finish(at_segment_leg+MessageSegment.image(image_leg))
-                return
-            except MatcherException:
-                raise
+                if dress_api_url:
+                    data = await get_dress_api_data(url=dress_api_url)
+                else: 
+                    data = await get_dress_api_data(url=None)
+                break
+            except RuntimeError as e:
+                continue
+                error = e
             except Exception as e:
-                if i == 4:
-                    await leg.finish(f"获取图片失败，请稍后再试~:{e}")
-                else:
-                    continue
-    elif config.simple_setu_on_command_leg_enable == 0:
-        await leg.finish("腿子图功能已关闭！")
+                error = e
+                continue
+        else:
+          await femboy.finish(f"请求API失败了喵~,{error}")
+        url = data["path"]
+        update_time = data["time"]
+        author = data["author"]
+        MessageText = Text(f"\n上传时间:{update_time}\n贡献者:{author}\nNotice:Cute-Dress/Dress CC BY-NC-SA 4.0\n")
+        MessageImage = Image(url)
+        await MessageFactory([MessageText,MessageImage]).send(at_sender=True,
+                                                            reply=True)
+        await femboy.finish()
     else:
-        await leg.finish("你的配置有误！")
-
-girl = on_command("girl", aliases={"少女写真", "来份写真"})
-
-@girl.handle()
-async def handle_function(event: MessageEvent, args: Message = CommandArg()):
-    # 提取参数纯文本作为地名，并判断是否有效
-    if config.simple_setu_girl_enable == 1:
-        sender_qq_girl = event.get_user_id()
-        for i in range(5):
-            try:
-                # 该部分与腿子图相同
-                response_girl = await http_client.get("https://api.lolimi.cn/API/meinv/api.php?type=json")
-                json_dict_girl = response_girl.json()
-                # 只不过api多了个嵌套
-                image_girl = json_dict_girl["data"]["image"]
-                at_segment_girl = MessageSegment.at(user_id=sender_qq_girl)
-                await girl.finish(at_segment_girl+MessageSegment.image(image_girl))
-                return
-            except MatcherException:
-                raise
-            except Exception as e:
-                if i == 4:
-                    await girl.finish(f"获取图片失败，请稍后再试~:{e}")
-                else:
-                    continue
-    elif config.simple_setu_girl_enable == 0:
-        await girl.finish("少女写真功能已关闭")
-    else:
-        await girl.finish("你的配置有误！")
-
-fake_cross_dresser = on_keyword({"看看腿"},rule=to_me())
-# 等同于腿子图
-@fake_cross_dresser.handle()
-async def handle_function(event: MessageEvent):
-    if config.simple_setu_on_keyword_leg_enable == 1:
-        sender_qq_fake = event.get_user_id()
-        for i in range(5):
-            try:
-                response_fake = await http_client.get("https://api.lolimi.cn/API/meizi/api.php?type=json")
-                json_dict_fake = response_fake.json()
-                image_fake = json_dict_fake["text"]
-                at_segment_fake = MessageSegment.at(user_id=sender_qq_fake)
-                await fake_cross_dresser.finish(at_segment_fake+"\n"+MessageSegment.image(image_fake))
-                return
-            except MatcherException:
-                raise
-            except Exception as e:
-                if i == 4:
-                    await fake_cross_dresser.finish(f"获取图片失败，请稍后再试~:{e}")
-                else:
-                    continue
-    elif config.simple_setu_on_keyword_leg_enable == 0:
-        await fake_cross_dresser.finish("at获取腿子图已关闭")
-    else:
-        await fake_cross_dresser.finish("你的配置有误")
-
-driver = get_driver()
-
-@driver.on_shutdown
-async def shutdown():
-    await http_client.aclose()
-
-
+        await femboy.finish("主人不想让你看小男娘喵")
 
 
