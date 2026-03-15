@@ -83,16 +83,21 @@ async def get_dress_api_data(url: str):
                     response = await http_client.get(url)
                     if response.status_code == 200:
                         response = response.json()
-                except httpx.RequestError:
+                        break
+                except Exception as e:
+                    error = e
                     continue
         else:
-            raise RuntimeError("所有API请求失败")
+            raise RuntimeError(f"所有API请求失败:{error}")
     else:
         async with httpx.AsyncClient() as http_client:
+
             response = await http_client.get(url)
             if response.status_code == 200:
                 response = response.json()
-            raise RuntimeError("API请求失败")
+            else:
+
+                raise RuntimeError(f"API请求失败")
     finally_result = {
         "author": "",
         "hash": "",
