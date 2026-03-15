@@ -11,10 +11,10 @@
 _✨ NoneBot 简单色图插件 ✨_
 
 <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/owner/nonebot-plugin-template.svg" alt="license">
+    <img src="https://img.shields.io/badge/License-LGPL%20v3.0-green.svg" alt="license">
 </a>
 <a href="https://pypi.org/project/nonebot-plugin-simple-setu/">
-    <img src="https://img.shields.io/pypi/v/nonebot-plugin-template.svg" alt="pypi">
+    <img src="https://img.shields.io/pypi/v/nonebot-plugin-simple-setu.svg" alt="pypi">
 </a>
 <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
 
