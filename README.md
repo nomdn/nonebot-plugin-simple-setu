@@ -90,7 +90,16 @@ limit= 2
 |:-----:|:----:|:---:|:--:|:----:|
 | /setu |  群员  |  否  | 群聊 | 随机获得一张色图,后面可以加tag，如/setu tag |
 | /dress-api  |  群员  |  否  | 群聊 | 获取一张男娘图片 |
+
 ### 效果图
 
-
-
+## 致谢
+[nonebot2](https://github.com/nonebot/nonebot2)  
+[nonebot-plugin-template](https://github.com/A-kirami/nonebot-plugin-template)  
+[nonebot-plugin-send-anything-anywhere](https://github.com/MountainDash/nonebot-plugin-send-anything-anywhere)  
+[nonebot-plugin-limiter](https://github.com/MiddleRed/nonebot-plugin-limiter)  
+[nonebot-plugin-localstore](https://github.com/nonebot/plugin-localstore)  
+[dress-api](https://github.com/nomdn/dress-api)  
+[Dress](https://github.com/Cute-Dress/Dress)  
+[loliconAPI](https://api.lolicon.app/)  
+And You
