@@ -111,7 +111,7 @@ async def get_dress_api_data(url: str):
         update_time = response["upload_time"]
         author = response["img_author"]
     except:
-        url = response["path"]
+        url = response["url"]
         update_time = response["time"]
         author = response["author"]
     finally_result["author"] = author
